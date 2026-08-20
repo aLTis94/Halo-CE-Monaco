@@ -58,12 +58,12 @@
 	)
 )
 
-(script continuous speed_damage_cont
+;*(script continuous speed_damage_cont
 	(speed_damage car0 car0_vel car0_x car0_y)
 	(speed_damage car1 car1_vel car1_x car1_y)
 	(speed_damage car2 car2_vel car2_x car2_y)
 	(speed_damage car3 car3_vel car3_x car3_y)
-)
+)*;
 
 (script static void (speed_damage (unit car) (real vel) (real x) (real y))
 	(set temp (abs_real (objects_distance_to_position car 10000 0 0)))
