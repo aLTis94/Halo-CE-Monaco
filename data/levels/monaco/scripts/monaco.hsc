@@ -52,8 +52,9 @@
 		(begin
 			(print "is sp!")
 			(set is_mp 0)
-			;(vehicle_load_magic car0 "" (player0))
+			(vehicle_load_magic car0 "" (player0))
 			(vehicle_load_magic car1 "" (player1))
+			(object_destroy_containing "mp")
 		)
 	)
 )
