@@ -3,13 +3,12 @@
 (global real crash_large_vel 0.06)
 
 (global real temp 0)
-(global real temp2 0)
-(global real temp3 0)
 (global real car0_vel 0)
 (global real car1_vel 0)
 (global real car2_vel 0)
 (global real car3_vel 0)
 (global real car4_vel 0)
+(global real car5_vel 0)
 
 (global short is_mp -1)
 (global boolean is_race false)
@@ -27,6 +26,8 @@
 )
 
 (script startup setup
+	(if (not (game_is_authoritative)) (sleep_forever))
+	(object_create_containing boat)
 	(sleep 10)
 	(if (= (objects_distance_to_position mp_check 0 0 0) -1)
 		(begin
@@ -66,19 +67,26 @@
 )
 
 (script static void mp_race
-	(player_enable_input false)
+	;what if I do this: player spawns are next to the start line but once the race starts, they all get blocked by a
+	;large vehicle. then the players spawn in the pitstops where the cars respawn
+	
+	;(player_enable_input false)
 	(object_create_containing car)
-	(sleep 90)
+	;*(sleep 20)
 	(if (!= (player0) none) (object_teleport car0 spawn0))
-	(vehicle_load_magic car0 "" (player0))
+	;(objects_attach car0 "" (player0) "")
+	;(objects_detach car0 (player0))
+	(object_teleport (player0) tele0)
+	;(vehicle_load_magic car0 "" (player0))
 	(if (!= (player1) none) (object_teleport car1 spawn1))
-	(vehicle_load_magic car1 "" (player1))
+	(object_teleport (player1) tele1)
+	;(vehicle_load_magic car1 "" (player1))
 	(if (!= (player2) none) (object_teleport car2 spawn2))
-	(vehicle_load_magic car2 "" (player2))
+	;(vehicle_load_magic car2 "" (player2))
 	(if (!= (player3) none) (object_teleport car3 spawn3))
-	(vehicle_load_magic car3 "" (player3))
+	;(vehicle_load_magic car3 "" (player3))
 	(sleep 90)
-	(player_enable_input true)
+	;(player_enable_input true)*;
 )
 
 (script continuous respawn_vehicles
@@ -89,30 +97,40 @@
 	(sleep 5)
 )
 
+(script continuous respawn_boats
+	(if (volume_test_objects script_room boat0) (object_teleport boat0 boat_spawn0))
+	(object_teleport boat0 boat_spawn0)
+	(sleep 90)
+)
+
 (script continuous speed_damage_cont
 	(speed_damage car0 car0_vel dummy0)
 	(speed_damage car1 car1_vel dummy1)
 	(speed_damage car2 car2_vel dummy2)
 	(speed_damage car3 car3_vel dummy3)
+	(speed_damage car4 car4_vel dummy4)
+	(speed_damage car5 car5_vel dummy5)
 )
 
 (script static void (speed_damage (unit car) (real vel) (object dummy))
-	(set temp3 (objects_distance_to_object car dummy))
-	;(inspect temp3)
+	(set temp (objects_distance_to_object car dummy))
+	;(inspect temp)
 	
-	(if (and (> (abs_real (- temp3 vel)) crash_med_vel) damage_enabled)
+	(if (and (> (abs_real (- temp vel)) crash_med_vel) damage_enabled)
 		(begin
-			;(inspect (abs_real (- temp3 vel)))
+			;(inspect (abs_real (- temp vel)))
 			(damage_object "levels\monaco\effects\damage\crash_med" (vehicle_driver car))
-			(if (> (abs_real (- temp3 vel)) crash_large_vel)
+			(if (> (abs_real (- temp vel)) crash_large_vel)
 				(damage_object "levels\monaco\effects\damage\crash_large" (vehicle_driver car))
 	)))
 	
 	(cond 
-		((= car car0) (set car0_vel temp3))
-		((= car car1) (set car1_vel temp3))
-		((= car car2) (set car2_vel temp3))
-		((= car car3) (set car3_vel temp3))
+		((= car car0) (set car0_vel temp))
+		((= car car1) (set car1_vel temp))
+		((= car car2) (set car2_vel temp))
+		((= car car3) (set car3_vel temp))
+		((= car car4) (set car4_vel temp))
+		((= car car5) (set car5_vel temp))
 	)
 	
 	(objects_attach car "" dummy "")
@@ -137,7 +155,7 @@
 	)
 )
 
-;*(script continuous engine_light
+(script continuous engine_light
 	(if (> (unit_get_health (vehicle_driver car0)) 0.33)
 		(object_set_shield car0 0)
 		(object_set_shield car0 1.0)
@@ -146,12 +164,36 @@
 		(object_set_shield car1 0)
 		(object_set_shield car1 1.0)
 	)
-	(if (> (unit_get_health (vehicle_driver car2)) 0.33)
-		(object_set_shield car2 0)
-		(object_set_shield car2 1.0)
+)
+
+
+;(script continuous testwe
+;	(inspect (device_get_position car0_control))
+;	(inspect (device_get_power car0_control))
+;)
+
+(script continuous controls
+	(if (= (vehicle_driver car0) "none")
+		(begin
+			(object_create car0_control)
+			(objects_attach car0 "taillights" car0_control "")
+			(objects_detach car0 car0_control)
+			
+			(if (> (device_get_position car0_control) 0)
+				(begin
+					(object_create_anew car0_control)
+					(object_create_anew car0_biped)
+					(objects_attach car0 "" car0_biped "")
+					(objects_detach car0 car0_biped)
+					(sleep 1)
+					(objects_attach car0_biped "head" car0 "")
+					(objects_detach car0_biped car0)
+					(sleep 1)
+					(object_destroy car0_biped)
+				)
+			)
+		)
+		(object_destroy car0_control)
 	)
-	(if (> (unit_get_health (vehicle_driver car3)) 0.33)
-		(object_set_shield car3 0)
-		(object_set_shield car3 1.0)
-	)
-)*;
+	(sleep 1)
+)
