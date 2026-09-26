@@ -1,4 +1,8 @@
 
+(global short teleport_timer 100)
+(global short race_countdown_timer 10)
+(global short race_countdown 120)
+
 (global real crash_med_vel 0.0285)
 (global real crash_large_vel 0.06)
 
@@ -17,8 +21,8 @@
 
 (script startup client_script_killer
 	(if (game_is_authoritative) (sleep_forever))
-	(sleep_forever setup)
-	(sleep_forever mp_race)
+	;(sleep_forever setup)
+	;(sleep_forever mp_race)
 	(sleep_forever speed_damage_cont)
 	(sleep_forever pitstop_cont)
 	(sleep_forever respawn_vehicles)
@@ -26,8 +30,8 @@
 )
 
 (script startup setup
-	(if (not (game_is_authoritative)) (sleep_forever))
-	(object_create_containing boat)
+	;(if (not (game_is_authoritative)) (sleep_forever))
+	(if  (game_is_authoritative) (object_create_containing boat))
 	(sleep 10)
 	(if (= (objects_distance_to_position mp_check 0 0 0) -1)
 		(begin
@@ -39,7 +43,7 @@
 				(begin
 					(print "is race!")
 					(set is_race true)
-					(mp_race)
+					;(mp_race)
 				)
 				(begin
 					(print "is not race")
@@ -66,27 +70,50 @@
 	(set damage_enabled true)
 )
 
-(script static void mp_race
-	;what if I do this: player spawns are next to the start line but once the race starts, they all get blocked by a
-	;large vehicle. then the players spawn in the pitstops where the cars respawn
+(script startup mp_race
+;what if I do this: player spawns are next to the start line but once the race starts, they all get blocked by a
+;large vehicle. then the players spawn in the pitstops where the cars respawn
+	(sleep_until (> (game_time_authoritative) 30) 1)
+	(if (not is_race) (sleep_forever))
+	(if (game_is_authoritative) (object_create_containing car))
+	;(sleep_forever) ;uncomment for testing
+	(player_enable_input false)
 	
-	;(player_enable_input false)
-	(object_create_containing car)
-	;*(sleep 20)
-	(if (!= (player0) none) (object_teleport car0 spawn0))
-	;(objects_attach car0 "" (player0) "")
-	;(objects_detach car0 (player0))
-	(object_teleport (player0) tele0)
-	;(vehicle_load_magic car0 "" (player0))
-	(if (!= (player1) none) (object_teleport car1 spawn1))
-	(object_teleport (player1) tele1)
-	;(vehicle_load_magic car1 "" (player1))
-	(if (!= (player2) none) (object_teleport car2 spawn2))
-	;(vehicle_load_magic car2 "" (player2))
-	(if (!= (player3) none) (object_teleport car3 spawn3))
-	;(vehicle_load_magic car3 "" (player3))
-	(sleep 90)
-	;(player_enable_input true)*;
+	(sleep_until (>= (game_time_authoritative) teleport_timer) 1)
+	(player_enable_input true)
+	(if (= (game_time_authoritative) teleport_timer)
+		(begin
+			;(sound_impulse_start "levels\monaco\sound\let_the_race_begin" none 1)
+			(sound_impulse_start "levels\monaco\sound\gentlemen_start_your_engines" none 1)
+			(if (!= (player0) none) (object_teleport car0 spawn0))
+			;(objects_attach car0 "" (player0) "")
+			;(objects_detach car0 (player0))
+			(object_teleport (player0) tele0)
+			(if (!= (player1) none) (object_teleport car1 spawn1))
+			(object_teleport (player1) tele1)
+			(if (!= (player2) none) (object_teleport car2 spawn2))
+			(if (!= (player3) none) (object_teleport car3 spawn3))
+			
+			(wake disable_controls)
+		)
+	)
+	(sleep_until (= (game_time_authoritative) (+ teleport_timer race_countdown_timer)) 1)
+	(print "3 2 1")
+	(sound_impulse_start "levels\monaco\sound\race_start" none 1)
+	
+	(sleep race_countdown)
+	(print "gooo")
+	(player_enable_input true)
+)
+
+;This script should only run for each client separately
+(script dormant disable_controls
+	(units_set_desired_flashlight_state (players) true)
+	(sleep_until (not (unit_get_current_flashlight_state (unit (list_get (local_players) 0)))) 1)
+	(print "in car")
+	(player_enable_input false) ;I should not run this on splitscreen!
+	(sleep (+ race_countdown teleport_timer race_countdown_timer))
+	(player_enable_input true)
 )
 
 (script continuous respawn_vehicles
@@ -172,7 +199,7 @@
 ;	(inspect (device_get_power car0_control))
 ;)
 
-(script continuous controls
+;*(script continuous controls
 	(if (= (vehicle_driver car0) "none")
 		(begin
 			(object_create car0_control)
@@ -196,4 +223,4 @@
 		(object_destroy car0_control)
 	)
 	(sleep 1)
-)
+)*;
