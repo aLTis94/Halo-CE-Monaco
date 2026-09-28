@@ -1,7 +1,7 @@
 
 (global short teleport_timer 100)
-(global short race_countdown_timer 10)
-(global short race_countdown 120)
+(global short race_countdown_timer 180)
+(global short race_countdown 170)
 
 (global real crash_med_vel 0.0285)
 (global real crash_large_vel 0.06)
