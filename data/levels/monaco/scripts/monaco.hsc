@@ -126,7 +126,16 @@
 
 (script continuous respawn_boats
 	(if (volume_test_objects script_room boat0) (object_teleport boat0 boat_spawn0))
-	(object_teleport boat0 boat_spawn0)
+	(if (volume_test_objects script_room boat1) (object_teleport boat0 boat_spawn1))
+	(if (volume_test_objects script_room boat2) (object_teleport boat0 boat_spawn2))
+	(if (volume_test_objects script_room boat3) (object_teleport boat0 boat_spawn3))
+	(if (volume_test_objects script_room boat4) (object_teleport boat0 boat_spawn4))
+	(if (volume_test_objects script_room boat5) (object_teleport boat0 boat_spawn5))
+	(if (volume_test_objects script_room boat6) (object_teleport boat0 boat_spawn6))
+	(if (volume_test_objects script_room boat7) (object_teleport boat0 boat_spawn7))
+	(object_teleport boat5 boat_spawn5)
+	(object_teleport boat6 boat_spawn6)
+	(object_teleport boat7 boat_spawn7)
 	(sleep 90)
 )
 
