@@ -101,9 +101,20 @@
 	(print "3 2 1")
 	(sound_impulse_start "levels\monaco\sound\race_start" none 1)
 	
-	(sleep race_countdown)
+	(object_create red_light1)
+	(sleep 30)
+	(object_create red_light2)
+	(sleep 30)
+	(object_create red_light3)
+	(sleep 30)
+	(object_create red_light4)
+	(sleep 30)
+	(object_create red_light5)
+	
+	(sleep (- race_countdown 120))
 	(print "gooo")
 	(player_enable_input true)
+	(object_destroy_containing red_light)
 )
 
 ;This script should only run for each client separately
