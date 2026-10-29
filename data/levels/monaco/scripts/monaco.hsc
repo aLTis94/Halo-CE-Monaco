@@ -128,6 +128,24 @@
 	(player_enable_input true)
 )
 
+(script static void test_lights
+	(sleep 150)
+	(sound_impulse_start "levels\monaco\sound\race_start" none 1)
+	
+	(object_create red_light5)
+	(sleep 30)
+	(object_create red_light4)
+	(sleep 30)
+	(object_create red_light3)
+	(sleep 30)
+	(object_create red_light2)
+	(sleep 30)
+	(object_create red_light1)
+	
+	(sleep (- race_countdown 120))
+	(object_destroy_containing red_light)
+)
+
 (script continuous respawn_vehicles
 	(if (volume_test_objects script_room car0) (object_teleport car0 car_pit0))
 	(if (volume_test_objects script_room car1) (object_teleport car1 car_pit1))
