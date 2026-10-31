@@ -88,8 +88,6 @@
 			;(sound_impulse_start "levels\monaco\sound\let_the_race_begin" none 1)
 			(sound_impulse_start "levels\monaco\sound\gentlemen_start_your_engines" none 1)
 			(if (!= (player0) none) (object_teleport car0 spawn0))
-			;(objects_attach car0 "" (player0) "")
-			;(objects_detach car0 (player0))
 			(object_teleport (player0) tele0)
 			(if (!= (player1) none) (object_teleport car1 spawn1))
 			(object_teleport (player1) tele1)
@@ -120,6 +118,7 @@
 	(sleep_forever disable_controls)
 	(player_enable_input true)
 	(object_destroy_containing red_light)
+	(recording_kill (unit (list_get (local_players) 0)))
 )
 
 ;This script should only run for each client separately
@@ -127,7 +126,10 @@
 	(units_set_desired_flashlight_state (players) true)
 	(sleep_until (not (unit_get_current_flashlight_state (unit (list_get (local_players) 0)))) 1)
 	(print "in car")
-	(player_enable_input false) ;I should not run this on splitscreen!
+	(if (game_is_authoritative)
+		(recording_play (unit (list_get (local_players) 0)) nothing2)
+		(player_enable_input false) ;I should not run this on splitscreen!
+	)
 	(sleep (+ race_countdown teleport_timer race_countdown_timer))
 	(player_enable_input true)
 )
