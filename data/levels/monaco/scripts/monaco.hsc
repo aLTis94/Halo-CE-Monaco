@@ -97,6 +97,7 @@
 			(object_teleport (player3) tele3)
 			
 			(wake disable_controls)
+			(disable_cars)
 		)
 	)
 	(sleep_until (= (game_time_authoritative) (+ teleport_timer race_countdown_timer)) 1)
@@ -118,7 +119,22 @@
 	(sleep_forever disable_controls)
 	(player_enable_input true)
 	(object_destroy_containing red_light)
+	(enable_cars)
 	(recording_kill (unit (list_get (local_players) 0)))
+)
+
+(script static void disable_cars
+	(recording_play car0 nothing2)
+	(recording_play car1 nothing2)
+	(recording_play car2 nothing2)
+	(recording_play car3 nothing2)
+)
+
+(script static void enable_cars
+	(recording_kill car0)
+	(recording_kill car1)
+	(recording_kill car2)
+	(recording_kill car3)
 )
 
 ;This script should only run for each client separately
