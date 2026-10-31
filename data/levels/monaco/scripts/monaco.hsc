@@ -73,6 +73,8 @@
 (script startup mp_race
 ;what if I do this: player spawns are next to the start line but once the race starts, they all get blocked by a
 ;large vehicle. then the players spawn in the pitstops where the cars respawn
+
+;what if I use trig volumes to check who spawns where and then teleport them based on that
 	(sleep_until (> (game_time_authoritative) 30) 1)
 	(if (not is_race) (sleep_forever))
 	(if (game_is_authoritative) (object_create_containing car))
@@ -92,7 +94,9 @@
 			(if (!= (player1) none) (object_teleport car1 spawn1))
 			(object_teleport (player1) tele1)
 			(if (!= (player2) none) (object_teleport car2 spawn2))
+			(object_teleport (player2) tele2)
 			(if (!= (player3) none) (object_teleport car3 spawn3))
+			(object_teleport (player3) tele3)
 			
 			(wake disable_controls)
 		)
