@@ -62,6 +62,8 @@
 			(set is_mp 0)
 			(vehicle_load_magic car0 "" (player0))
 			(vehicle_load_magic car1 "" (player1))
+			(if (!= (player0) none) (object_teleport car0 spawn0))
+			(if (!= (player1) none) (object_teleport car1 spawn1))
 			(object_destroy_containing "mp")
 		)
 	)
@@ -261,7 +263,7 @@
 	)
 )
 
-(script continuous engine_light
+;*(script continuous engine_light
 	(if (> (unit_get_health (vehicle_driver car0)) 0.33)
 		(object_set_shield car0 0)
 		(object_set_shield car0 1.0)
@@ -270,7 +272,7 @@
 		(object_set_shield car1 0)
 		(object_set_shield car1 1.0)
 	)
-)
+)*;
 
 
 ;(script continuous testwe
@@ -303,3 +305,7 @@
 	)
 	(sleep 1)
 )*;
+
+(script continuous testingggg
+	(if (< (unit_get_shield car0) 1) (inspect (unit_get_shield car0)) )
+)
