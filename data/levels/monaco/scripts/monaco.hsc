@@ -31,7 +31,7 @@
 
 (script startup setup
 	;(if (not (game_is_authoritative)) (sleep_forever))
-	(if  (game_is_authoritative) (object_create_containing boat))
+	(if  (game_is_authoritative) (begin (object_create_containing boat) (object_create safety_car)))
 	(sleep 10)
 	(if (= (objects_distance_to_position mp_check 0 0 0) -1)
 		(begin
@@ -60,7 +60,7 @@
 		(begin
 			(print "is sp!")
 			(set is_mp 0)
-			;(vehicle_load_magic car0 "" (player0))
+			(vehicle_load_magic car0 "" (player0))
 			(vehicle_load_magic car1 "" (player1))
 			(object_destroy_containing "mp")
 		)
@@ -95,6 +95,10 @@
 			(object_teleport (player2) tele2)
 			(if (!= (player3) none) (object_teleport car3 spawn3))
 			(object_teleport (player3) tele3)
+			(if (!= (player4) none) (object_teleport car4 spawn4))
+			(object_teleport (player4) tele4)
+			(if (!= (player5) none) (object_teleport car5 spawn5))
+			(object_teleport (player5) tele5)
 			
 			(wake disable_controls)
 			(disable_cars)
@@ -128,6 +132,8 @@
 	(recording_play car1 nothing2)
 	(recording_play car2 nothing2)
 	(recording_play car3 nothing2)
+	(recording_play car4 nothing2)
+	(recording_play car5 nothing2)
 )
 
 (script static void enable_cars
@@ -135,6 +141,8 @@
 	(recording_kill car1)
 	(recording_kill car2)
 	(recording_kill car3)
+	(recording_kill car4)
+	(recording_kill car5)
 )
 
 ;This script should only run for each client separately
@@ -173,6 +181,8 @@
 	(if (volume_test_objects script_room car1) (object_teleport car1 car_pit1))
 	(if (volume_test_objects script_room car2) (object_teleport car2 car_pit2))
 	(if (volume_test_objects script_room car3) (object_teleport car3 car_pit3))
+	(if (volume_test_objects script_room car4) (object_teleport car4 car_pit4))
+	(if (volume_test_objects script_room car5) (object_teleport car5 car_pit5))
 	(sleep 5)
 )
 
@@ -190,6 +200,7 @@
 	(if (volume_test_objects script_room boat10) (object_teleport boat10 boat_spawn10))
 	(if (volume_test_objects script_room boat11) (object_teleport boat11 boat_spawn11))
 	(if (volume_test_objects script_room boat12) (object_teleport boat12 boat_spawn12))
+	(if (volume_test_objects script_room safety_car) (object_teleport safety_car safety_car_spawn))
 	;(object_teleport boat5 boat_spawn5)
 	;(object_teleport boat6 boat_spawn6)
 	;(object_teleport boat7 boat_spawn7)
