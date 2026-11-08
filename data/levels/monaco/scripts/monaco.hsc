@@ -44,11 +44,11 @@
 					(set is_race true)
 					;(mp_race)
 				)
-				(begin
+				(if  (game_is_authoritative) (begin
 					(print "is not race")
 					(object_create_anew_containing goose)
 					(object_create_anew_containing car)
-				)
+				))
 			)
 		)
 		(begin
@@ -218,10 +218,9 @@
 
 (script static void (pitstop (unit car) (real vel))
 	(sleep 1)
-	(if (and (< vel 0.12)(or (volume_test_objects pitstop1 car) (volume_test_objects pitstop2 car)) (< (unit_get_health (vehicle_driver car)) 1))
-		(begin
-			(damage_object "levels\monaco\effects\damage\heal" (vehicle_driver car))
-		)
+	;(if (and (< vel 0.12)(or (volume_test_objects pitstop1 car) (volume_test_objects pitstop2 car)) (< (unit_get_health (vehicle_driver car)) 1))
+	(if (and (or (volume_test_objects pitstop1 car) (volume_test_objects pitstop2 car)) (< (unit_get_health (vehicle_driver car)) 1))
+		(damage_object "levels\monaco\effects\damage\heal" (vehicle_driver car))
 	)
 )
 
