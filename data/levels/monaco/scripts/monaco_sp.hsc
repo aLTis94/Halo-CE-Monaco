@@ -1,4 +1,6 @@
 
+;need to look into lap times for coop
+
 (global short modulo_tmp 0)
 (global boolean finished false)
 (global unit winner_player none)
@@ -9,6 +11,8 @@
 (global long race_start_minutes 0)
 (global long race_start_seconds 0)
 (global long race_start_time 0)
+(global long race_finish_minutes 0)
+(global long race_finish_seconds 0)
 (global long race_finish_time 0)
 (global long best_lap_time 10000000)
 
@@ -20,12 +24,47 @@
 	(sleep 30)
 	(if (= is_mp 0)
 		(begin
-			(wake checkpoints_a_player0)
-			(wake checkpoints_a_player1)
-			(wake timer)
 			(wake real_timer)
+			(sp_race)
 		)
 	)
+)
+
+(script static void sp_race
+	(object_create_containing car)
+	(player_enable_input false)
+	(sound_impulse_start "levels\monaco\sound\gentlemen_start_your_engines" none 1)
+	
+	(if (!= (player0) none) (object_teleport car0 spawn0))
+	(vehicle_load_magic car0 "" (player0))
+	(if (!= (player1) none) (object_teleport car1 spawn1))
+	(vehicle_load_magic car1 "" (player1))
+
+	(sleep 160)
+	(print "3 2 1")
+	(sound_impulse_start "levels\monaco\sound\race_start" none 1)
+	(object_create red_light5)
+	(sleep 30)
+	(object_create red_light4)
+	(sleep 30)
+	(object_create red_light3)
+	(sleep 30)
+	(object_create red_light2)
+	(sleep 30)
+	(object_create red_light1)
+	
+	(sleep 50)
+	(print "gooo")
+	(player_enable_input true)
+	(object_destroy_containing red_light)
+	;(hud_set_timer_position 0 0 bottom_right)
+	;(hud_set_timer_time 0 0)
+	(inspect (/ (game_time_authoritative) 30))
+	
+	;(sleep 20)
+	(wake timer)
+	(wake checkpoints_a_player0)
+	(wake checkpoints_a_player1)
 )
 
 (script continuous checkpoints_a_player0
@@ -49,14 +88,21 @@
 		(if finish_line
 			(begin
 				;(set finished true)
+				(set race_finish_minutes (- timer_minutes race_start_minutes))
+				(set race_finish_seconds (- timer_seconds race_start_seconds))
+				(print "Finish!")
+				(print "Minutes:")
+				(inspect race_finish_minutes)
+				(print "Seconds:")
+				(inspect race_finish_seconds)
 				(set winner_player (unit (list_get (players) id)))
 				(sound_impulse_start "sound\sfx\ui\teleporter_fatal_coexistence" "none" 1)
-				(if (> best_lap_time (+ timer_seconds (* timer_minutes 60)))
+				(if (> best_lap_time (+ race_finish_seconds (* race_finish_minutes 60)))
 					(begin
 						(print "new best lap time!")
 						(numeric_countdown_timer_restart)
-						(numeric_countdown_timer_set (* (+ timer_seconds (* timer_minutes 60)) 1000) false)
-						(set best_lap_time (+ timer_seconds (* timer_minutes 60)))
+						(numeric_countdown_timer_set (* (+ race_finish_seconds (* race_finish_minutes 60)) 1000) false)
+						(set best_lap_time (+ race_finish_seconds (* race_finish_minutes 60)))
 					)
 				)
 				
@@ -69,11 +115,11 @@
 (script static void (checkpoints_a (short id))
 	
 	(set race_start_minutes timer_minutes)
-	(set race_start_seconds timer_seconds)
+	(set race_start_seconds (+ timer_seconds 1))
 	(set race_start_time (game_time_authoritative))
 	(hud_set_timer_position 0 0 bottom_right)
 	(hud_set_timer_time 0 0)
-	(wake timer)
+	;(wake timer)
 	
 	(checkpoint a1 id false)
 	(print "a1")
@@ -89,8 +135,18 @@
 	(print "a6")
 	(checkpoint a7 id false)
 	(print "a7")
-	(checkpoint a8 id true)
+	(checkpoint a8 id false)
 	(print "a8")
+	(checkpoint a9 id false)
+	(print "a9")
+	(checkpoint a10 id false)
+	(print "a10")
+	(checkpoint a11 id false)
+	(print "a11")
+	(checkpoint a12 id false)
+	(print "a12")
+	(checkpoint a0 id true)
+	(print "a0")
 )
 
 (script continuous timer
@@ -102,6 +158,12 @@
 (script continuous real_timer
 	(set timer_minutes (modulo (/ (game_time_authoritative) 1800) 60))
 	(set timer_seconds (modulo (/ (game_time_authoritative) 30) 60))
+	;(inspect (game_time_authoritative))
+	;(print "minutes")
+	;(inspect (modulo (/ (game_time_authoritative) 1800) 60))
+	;(print "seconds")
+	;(inspect (modulo (/ (game_time_authoritative) 30) 60))
+	;(print " ")
 )
 
 (script static short (modulo (short x) (short y))

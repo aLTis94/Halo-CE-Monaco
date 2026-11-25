@@ -3,11 +3,8 @@
 (global short race_countdown_timer 180)
 (global short race_countdown 170)
 
-(global real crash_med_vel 0.0285)
-(global real crash_large_vel 0.06)
-
 (global real temp 0)
-(global real car0_vel 0)
+(global real car0_vel 0) ;vel doesn't even change, maybe remove it later
 (global real car1_vel 0)
 (global real car2_vel 0)
 (global real car3_vel 0)
@@ -16,8 +13,6 @@
 
 (global short is_mp -1)
 (global boolean is_race false)
-
-(global boolean damage_enabled false)
 
 (script startup client_script_killer
 	(if (game_is_authoritative) (sleep_forever))
@@ -61,9 +56,6 @@
 			(object_destroy_containing "mp")
 		)
 	)
-	
-	(sleep 60)
-	(set damage_enabled true)
 )
 
 (script startup mp_race
