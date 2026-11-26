@@ -14,6 +14,8 @@
 (global long race_finish_seconds 0)
 (global long best_lap_time 10000000)
 
+(global real accel_start 0)
+
 (script startup setup_checkpoints
 	(sleep_forever checkpoints_a_player0)
 	(sleep_forever checkpoints_a_player1)
@@ -155,6 +157,38 @@
 	(set timer_minutes (modulo (/ (game_time_authoritative) 1800) 60))
 	(set timer_seconds (modulo (/ (game_time_authoritative) 30) 60))
 )
+
+;*(script continuous speedo
+	(speed car0 dummy0)
+)
+
+(script static void (speed (unit car) (object dummy))
+	;(cls)
+	(set temp (- (objects_distance_to_object car dummy) 0.118159))
+	;(inspect temp)
+	(set temp (* temp 108000)) ; ticks to hours
+	;(set temp (objects_distance_to_object car dummy))
+	;(print "world units per hour")
+	;(inspect temp)
+	
+	;(print "km/h")
+	(set temp (* temp 0.003048)) ;world units to km
+	;(inspect temp)
+	
+	(objects_attach car "" dummy "")
+	(objects_detach car dummy)
+)*;
+
+;*(script startup get_accel
+	(sleep 50)
+	(sleep_until (> temp 1) 1)
+	(print "start")
+	(set accel_start (game_time_authoritative))
+	(sleep_until (>= temp 100) 1)
+	(print "reached speed")
+	(inspect (- (game_time_authoritative) accel_start))
+	(inspect (/ (- (game_time_authoritative) accel_start) 30))
+)*;
 
 (script static short (modulo (short x) (short y))
   (set modulo_tmp (/ x y))
